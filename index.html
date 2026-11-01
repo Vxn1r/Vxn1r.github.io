@@ -943,20 +943,22 @@
         return copied;
       }
 
+      function showCopyResult(copied) {
+        copyHint.textContent = copied ? "Username copied" : "Discord username: Vxn1r";
+        copyArrow.textContent = copied ? "DONE ✓" : "VXN1R";
+      }
+
       copyButton.addEventListener("click", function () {
         var username = "Vxn1r";
-        var copyPromise = navigator.clipboard && navigator.clipboard.writeText
-          ? navigator.clipboard.writeText(username)
-          : Promise.resolve(fallbackCopy(username));
-
-        Promise.resolve(copyPromise).then(function () {
-          copyHint.textContent = "Username copied";
-          copyArrow.textContent = "DONE ✓";
-        }).catch(function () {
-          var copied = fallbackCopy(username);
-          copyHint.textContent = copied ? "Username copied" : "Discord: Vxn1r";
-          copyArrow.textContent = copied ? "DONE ✓" : "VXN1R";
-        });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(username).then(function () {
+            showCopyResult(true);
+          }).catch(function () {
+            showCopyResult(fallbackCopy(username));
+          });
+        } else {
+          showCopyResult(fallbackCopy(username));
+        }
       });
 
       document.getElementById("year").textContent = new Date().getFullYear();
