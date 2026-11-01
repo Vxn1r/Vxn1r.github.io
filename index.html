@@ -794,9 +794,14 @@ footer a:hover { color: var(--white); }
 
 /* === SCROLL ANIMATIONS === */
 .fade-up {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.js-ready .fade-up:not(.visible) {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .fade-up.visible {
@@ -969,6 +974,4 @@ footer a:hover { color: var(--white); }
         <span class="skill-tag">Geolocation</span>
         <span class="skill-tag">Analysis</span>
       </div>
-    </div>
-    <div class="skill-card fade-up">
-      <span class="skil
+      
