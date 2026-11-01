@@ -21,9 +21,9 @@
       --text: #e7e7e7;
       --muted: #929292;
       --dim: #555;
-      --green: #39d353;
-      --green-soft: #0d2015;
-      --green-line: #1b4028;
+      --green: #ffffff;
+      --green-soft: rgba(255,255,255,.045);
+      --green-line: #2a2a2a;
       --mono: "DM Mono", "SFMono-Regular", Consolas, monospace;
       --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       --content: 1120px;
@@ -36,11 +36,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       background:
-        radial-gradient(ellipse at 78% 6%, rgba(57,211,83,.075), transparent 32rem),
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px),
-        var(--bg);
-      background-size: auto, 42px 42px, 42px 42px, auto;
+        radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #0d0520 40%, #000000 80%);
       color: var(--text);
       font-family: var(--sans);
       line-height: 1.6;
@@ -137,7 +133,7 @@
       flex: 0 0 7px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 10px rgba(57,211,83,.65);
+      box-shadow: 0 0 10px rgba(255,255,255,.55);
       animation: pulse 2s ease-in-out infinite;
     }
     .wrap { width: min(var(--content), calc(100% - 44px)); margin: 0 auto; }
@@ -213,7 +209,7 @@
       color: #061008;
       font-weight: 500;
     }
-    .button-primary:hover { background: #55ed70; border-color: #55ed70; }
+    .button-primary:hover { background: #e0e0e0; border-color: #e0e0e0; }
     .button-quiet { background: rgba(16,16,16,.8); color: var(--text); }
     .button-quiet:hover { border-color: var(--green); color: var(--green); }
     .hero-meta {
@@ -282,7 +278,7 @@
       content: "";
       position: absolute;
       inset: -5px;
-      border: 1px solid rgba(57,211,83,.24);
+      border: 1px solid rgba(255,255,255,.16);
       border-radius: 10px;
       animation: soft-pulse 3s ease-in-out infinite;
       pointer-events: none;
@@ -384,7 +380,7 @@
       background: var(--panel);
       transition: border-color .25s ease, transform .25s ease, background .25s ease;
     }
-    .skill-card:hover { transform: translateY(-4px); border-color: var(--green-line); background: #111611; }
+    .skill-card:hover { transform: translateY(-4px); border-color: var(--green-line); background: #111111; }
     .skill-index { color: var(--green); font-family: var(--mono); font-size: .68rem; }
     .skill-card h3 { margin: 15px 0 8px; font-size: 1.02rem; }
     .skill-card p { margin: 0; color: var(--muted); font-size: .79rem; line-height: 1.8; }
@@ -548,7 +544,7 @@
     }
     .is-open .contact-option { animation: option-in .4s ease forwards; }
     .is-open .contact-option:nth-child(2) { animation-delay: .08s; }
-    .contact-option:hover { border-color: var(--green-line); background: #101810; }
+    .contact-option:hover { border-color: var(--green-line); background: #101010; }
     .contact-icon {
       display: grid;
       width: 39px;
@@ -787,7 +783,7 @@
     </footer>
   </main>
 
-  <audio id="siteAudio" src="bipolar.mp3" preload="metadata" loop></audio>
+  <audio id="siteAudio" src="bipolar.mp3" preload="auto" autoplay loop></audio>
   <div class="music-dock" aria-label="Music player">
     <button class="play-toggle" id="playToggle" type="button" aria-label="Play music" title="Play music">▶</button>
     <div class="track-info">
@@ -874,6 +870,18 @@
         playbackStatus.textContent = "FILE ERROR";
         playButton.title = "Audio file could not be loaded";
       });
+
+      // Ask the browser to start the track as soon as the page loads.
+      // Browsers may block audible autoplay until the visitor interacts.
+      var autoplayAttempt = audio.play();
+      if (autoplayAttempt && typeof autoplayAttempt.then === "function") {
+        autoplayAttempt.then(function () {
+          setPlaybackUI(true);
+        }).catch(function () {
+          playbackStatus.textContent = "TAP TO PLAY";
+          playButton.title = "Your browser blocked automatic playback. Tap to start.";
+        });
+      }
 
       volumeSlider.addEventListener("input", function () {
         audio.volume = Number(volumeSlider.value);
