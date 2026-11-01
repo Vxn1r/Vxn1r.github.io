@@ -1,977 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vxn1r — Portfolio</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --bg: #000;
-  --bg2: #0a0a0a;
-  --bg3: #111;
-  --border: #1a1a1a;
-  --border-bright: #2a2a2a;
-  --text: #e0e0e0;
-  --text-mid: #888;
-  --text-dim: #555;
-  --white: #fff;
-  --accent: #fff;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Inter', system-ui, sans-serif;
-}
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #0d0520 40%, #000000 80%);
-  color: var(--text);
-  font-family: var(--sans);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* === NOISE OVERLAY === */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-}
-
-/* === VOLUME CONTROL === */
-.volume-control {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  z-index: 150;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 8px 14px 8px 10px;
-}
-
-.volume-btn {
-  background: none;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-}
-
-.volume-btn:hover {
-  background: rgba(255,255,255,0.08);
-}
-
-.volume-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-.volume-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 80px;
-  height: 3px;
-  background: var(--border-bright);
-  border-radius: 2px;
-  outline: none;
-}
-
-.volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--white);
-  cursor: pointer;
-}
-
-.now-playing {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 150;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 16px;
-}
-
-.np-icon {
-  width: 20px;
-  height: 20px;
-  color: var(--text-mid);
-}
-
-.np-icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-.np-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.np-title {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--white);
-}
-
-.np-artist {
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-/* === NAV === */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 48px;
-  background: rgba(10,5,30,0.88);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-}
-
-nav .logo {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--white);
-}
-
-nav .nav-links {
-  display: flex;
-  gap: 32px;
-  list-style: none;
-}
-
-nav .nav-links a {
-  font-family: var(--mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-dim);
-  text-decoration: none;
-  transition: color 0.3s;
-  position: relative;
-}
-
-nav .nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--white);
-  transition: width 0.3s;
-}
-
-nav .nav-links a:hover { color: var(--white); }
-nav .nav-links a:hover::after { width: 100%; }
-
-/* === HERO === */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 120px 48px 80px;
-  position: relative;
-}
-
-.hero-inner {
-  display: flex;
-  align-items: center;
-  gap: 80px;
-  max-width: 1100px;
-  width: 100%;
-}
-
-/* PROFILE PIC */
-.profile-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.profile-ring {
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  border: 1px solid var(--border-bright);
-  padding: 8px;
-  position: relative;
-}
-
-.profile-ring::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  border-top-color: var(--white);
-  animation: spin 8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.profile-pic {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  filter: grayscale(100%) contrast(1.1);
-  transition: filter 0.6s ease, transform 0.6s ease;
-  background: var(--bg3);
-}
-
-.profile-pic:hover {
-  filter: grayscale(0%) contrast(1);
-  transform: scale(1.02);
-}
-
-.profile-glow {
-  position: absolute;
-  inset: -20px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-/* HERO TEXT */
-.hero-text {
-  flex: 1;
-}
-
-.hero-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin-bottom: 24px;
-}
-
-.hero-name {
-  font-size: clamp(40px, 6vw, 72px);
-  font-weight: 700;
-  line-height: 1.05;
-  color: var(--white);
-  margin-bottom: 8px;
-  letter-spacing: -1px;
-}
-
-.hero-name .accent {
-  position: relative;
-  display: inline-block;
-}
-
-.hero-name .accent::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--white);
-  opacity: 0.7;
-}
-
-.hero-tagline {
-  font-size: 18px;
-  color: var(--text-mid);
-  font-weight: 300;
-  margin-bottom: 32px;
-  line-height: 1.5;
-}
-
-.hero-bio {
-  font-size: 14px;
-  color: var(--text-dim);
-  line-height: 1.8;
-  max-width: 480px;
-  margin-bottom: 40px;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 28px;
-  font-family: var(--mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: all 0.3s;
-  cursor: pointer;
-  border: 1px solid var(--border-bright);
-}
-
-.btn-primary {
-  background: var(--white);
-  color: var(--bg);
-  border-color: var(--white);
-}
-
-.btn-primary:hover {
-  background: transparent;
-  color: var(--white);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--text);
-  border-color: var(--border-bright);
-}
-
-.btn-outline:hover {
-  border-color: var(--white);
-  color: var(--white);
-}
-
-/* === SECTIONS === */
-section {
-  padding: 100px 48px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.section-header {
-  margin-bottom: 64px;
-}
-
-.section-label {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: -0.5px;
-}
-
-/* === ABOUT === */
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: start;
-}
-
-.about-text p {
-  font-size: 15px;
-  line-height: 1.8;
-  color: var(--text-mid);
-  margin-bottom: 20px;
-}
-
-.about-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.stat-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 28px;
-  border-radius: 8px;
-  transition: border-color 0.3s;
-}
-
-.stat-card:hover {
-  border-color: var(--border-bright);
-}
-
-.stat-num {
-  font-family: var(--mono);
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* === SKILLS === */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.skill-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 32px 28px;
-  border-radius: 8px;
-  transition: all 0.4s;
-  position: relative;
-  overflow: hidden;
-}
-
-.skill-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--white), transparent);
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.skill-card:hover {
-  border-color: var(--border-bright);
-  transform: translateY(-4px);
-}
-
-.skill-card:hover::before {
-  opacity: 0.5;
-}
-
-.skill-icon {
-  font-family: var(--mono);
-  font-size: 24px;
-  margin-bottom: 20px;
-  display: block;
-}
-
-.skill-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--white);
-  margin-bottom: 8px;
-}
-
-.skill-desc {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-dim);
-}
-
-.skill-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 16px;
-}
-
-.skill-tag {
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 4px 10px;
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  color: var(--text-mid);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* === SKILL BARS === */
-.skill-bars {
-  margin-top: 64px;
-}
-
-.skill-bar-group {
-  margin-bottom: 28px;
-}
-
-.skill-bar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.skill-bar-name {
-  font-family: var(--mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text);
-}
-
-.skill-bar-pct {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-.skill-bar-track {
-  width: 100%;
-  height: 2px;
-  background: var(--border);
-  border-radius: 1px;
-  overflow: hidden;
-}
-
-.skill-bar-fill {
-  height: 100%;
-  background: var(--white);
-  border-radius: 1px;
-  width: 0;
-  transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* === RANKINGS === */
-.rankings-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-  max-width: 520px;
-}
-
-.ranking-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 36px 32px;
-  transition: all 0.4s;
-  position: relative;
-  overflow: hidden;
-}
-
-.ranking-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--white), transparent);
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.ranking-card:hover {
-  border-color: var(--border-bright);
-}
-
-.ranking-card:hover::before {
-  opacity: 0.5;
-}
-
-.ranking-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.ranking-badge {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 700;
-  background: var(--white);
-  color: var(--bg);
-  padding: 8px 14px;
-  border-radius: 4px;
-  letter-spacing: 1px;
-}
-
-.ranking-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--white);
-}
-
-.ranking-subtitle {
-  font-size: 12px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.ranking-list {
-  list-style: none;
-}
-
-.ranking-list li {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.ranking-list li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.ranking-position {
-  font-family: var(--mono);
-  font-size: 20px;
-  font-weight: 700;
-  min-width: 60px;
-  color: var(--white);
-}
-
-.ranking-position.gold { color: #FFD700; }
-
-.ranking-info {
-  flex: 1;
-}
-
-.ranking-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.ranking-detail {
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-top: 2px;
-}
-
-.ranking-link {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-dim);
-  text-decoration: none;
-  letter-spacing: 1px;
-  transition: color 0.3s;
-}
-
-.ranking-link:hover {
-  color: var(--white);
-}
-
-/* === CONTACT === */
-.contact-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: start;
-}
-
-.contact-text p {
-  font-size: 15px;
-  line-height: 1.8;
-  color: var(--text-mid);
-  margin-bottom: 32px;
-}
-
-.contact-links {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.contact-link {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s;
-}
-
-.contact-link:hover {
-  border-color: var(--border-bright);
-  transform: translateX(4px);
-}
-
-.contact-link .cl-icon {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--white);
-  min-width: 32px;
-}
-
-.contact-link .cl-label {
-  font-size: 11px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.contact-link .cl-value {
-  font-size: 14px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.contact-ascii {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.8;
-  text-align: right;
-}
-
-/* === FOOTER === */
-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 32px 48px;
-  border-top: 1px solid var(--border);
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-footer p {
-  font-size: 12px;
-  color: var(--text-dim);
-  font-family: var(--mono);
-}
-
-footer .footer-right {
-  display: flex;
-  gap: 24px;
-}
-
-footer a {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-dim);
-  text-decoration: none;
-  letter-spacing: 1px;
-  transition: color 0.3s;
-}
-
-footer a:hover { color: var(--white); }
-
-/* === SCROLL ANIMATIONS === */
-.fade-up {
-  opacity: 1;
-  transform: none;
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.js-ready .fade-up:not(.visible) {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.fade-up.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 900px) {
-  nav { padding: 16px 24px; }
-  .hero { padding: 100px 24px 60px; }
-  .hero-inner { flex-direction: column; gap: 48px; text-align: center; }
-  .profile-ring { width: 200px; height: 200px; }
-  .hero-bio { margin: 0 auto 32px; }
-  .hero-actions { justify-content: center; }
-  section { padding: 80px 24px; }
-  .about-grid { grid-template-columns: 1fr; gap: 40px; }
-  .skills-grid { grid-template-columns: 1fr; }
-  .contact-inner { grid-template-columns: 1fr; gap: 40px; }
-  .contact-ascii { display: none; }
-  footer { flex-direction: column; gap: 16px; text-align: center; }
-  .volume-control { top: 80px; left: 16px; }
-  .now-playing { bottom: 16px; left: 16px; }
-}
-
-@media (max-width: 600px) {
-  .about-stats { grid-template-columns: 1fr; }
-  nav .nav-links { gap: 16px; }
-  nav .nav-links a { font-size: 10px; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vxn1r</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050505;
+      --card: rgba(12, 12, 14, 0.72);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e8e8e8;
+      --muted: #8a8a8a;
+      --accent: #c9a0a0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 50% 0%, #1a0a12 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, #0a0610 0%, transparent 50%),
+        #050505;
+      z-index: 0;
+    }
+
+    .bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .volume-control {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 14px 8px 10px;
+    }
+
+    .volume-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+    }
+
+    .volume-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .volume-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .volume-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 80px;
+      height: 3px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 32px 36px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+      text-align: center;
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .avatar-ring::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      border-top-color: rgba(255,255,255,0.35);
+      animation: spin 10s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .username {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .bio {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 28px;
+      font-weight: 300;
+    }
+
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .social {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .social:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-2px);
+    }
+
+    .social svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .footer-text {
+      margin-top: 28px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .now-playing {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .np-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .np-icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent);
+    }
+
+    .np-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .np-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .np-artist {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .entry {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.6s ease, visibility 0.6s;
+    }
+
+    .entry.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .entry-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-style: italic;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .entry-hint {
+      margin-top: 16px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 32px 24px 28px; }
+      .username { font-size: 28px; }
+      .volume-control { top: 16px; left: 16px; }
+    }
+  </style>
 </head>
 <body>
-
-<!-- VOLUME CONTROL -->
-<div class="volume-control">
-  <button class="volume-btn" id="muteBtn" aria-label="Mute">
-    <svg id="speakerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-    </svg>
-  </button>
-  <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.45">
-</div>
-
-<!-- NOW PLAYING -->
-<div class="now-playing">
-  <div class="np-icon">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-    </svg>
+  <div class="entry" id="entry">
+    <div class="entry-text">Love is the new lonely</div>
+    <div class="entry-hint">click to enter</div>
   </div>
-  <div class="np-info">
-    <div class="np-title">bipolar</div>
-    <div class="np-artist">.diedlonely</div>
-  </div>
-</div>
 
-<!-- NAV -->
-<nav>
-  <div class="logo">Vxn1r</div>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#rankings">Rankings</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
+  <div class="bg"></div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="profile-wrap fade-up">
-      <div class="profile-glow"></div>
-      <div class="profile-ring">
-        <img class="profile-pic" src="pfp.jpg" alt="Vxn1r" />
-      </div>
-    </div>
-    <div class="hero-text fade-up">
-      <div class="hero-eyebrow">// security researcher &amp; builder</div>
-      <h1 class="hero-name">
-        <span class="accent">Adarsh</span>
-      </h1>
-      <p class="hero-tagline">Vxn1r — CTF player, builder, and security researcher.</p>
-      <p class="hero-bio">
-        Indian security researcher focused on AI-powered security tools, 
-        autonomous agents, and open-source intelligence. I build things that 
-        think, scan, and investigate — so humans don't have to do it alone.
-      </p>
-      <div class="hero-actions">
-        <a href="#skills" class="btn btn-primary">View Skills</a>
-        <a href="#contact" class="btn btn-outline">Get in Touch</a>
-      </div>
-    </div>
+  <div class="volume-control" id="volumeControl">
+    <button class="volume-btn" id="muteBtn" title="Mute / Unmute">
+      <svg id="speakerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.45">
   </div>
-</section>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-header fade-up">
-    <div class="section-label">01 — About</div>
-    <h2 class="section-title">Who I am</h2>
-  </div>
-  <div class="about-grid">
-    <div class="about-text fade-up">
-      <p>
-        I'm an Indian security researcher and developer who lives at the intersection 
-        of AI and cybersecurity. My work spans from building autonomous AI agents 
-        that investigate threats, to developing OSINT dashboards that map digital 
-        footprints in real time.
-      </p>
-      <p>
-        I believe in building tools that empower people — not replace them. 
-        Every project I create is designed to augment human intelligence, 
-        not automate it away. I'm OPSEC-conscious by nature and open-source by heart.
-      </p>
-      <p>
-        When I'm not breaking into things (with permission), I'm building communities, 
-        mentoring newcomers, and pushing the boundaries of what local AI can do 
-        on consumer hardware.
-      </p>
-    </div>
-    <div class="about-stats fade-up">
-      <div class="stat-card">
-        <div class="stat-num">Top 6%</div>
-        <div class="stat-label">TryHackMe</div>
+  <div class="wrapper">
+    <div class="card">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        <img class="avatar" src="pfp.jpg" alt="Vxn1r" />
       </div>
-      <div class="stat-card">
-        <div class="stat-num">∞</div>
-        <div class="stat-label">Curiosity Level</div>
+
+      <h1 class="username">Vxn1r</h1>
+      <p class="tagline">Love is the new lonely</p>
+      <p class="bio">come love, make me better than I was 💙</p>
+
+      <div class="socials">
+        <a class="social" href="https://discord.com/users/Vxn1r.band" target="_blank" rel="noopener" title="Discord">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+        </a>
+
+        <a class="social" href="https://github.com/Vxn1r" target="_blank" rel="noopener" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+
+        <a class="social" href="https://www.instagram.com/vxn1r_07" target="_blank" rel="noopener" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+          </svg>
+        </a>
       </div>
-      <div class="stat-card">
-        <div class="stat-num">OPSEC</div>
-        <div class="stat-label">By Nature</div>
+
+      <div class="now-playing">
+        <div class="np-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+          </svg>
+        </div>
+        <div class="np-info">
+          <div class="np-title">bipolar</div>
+          <div class="np-artist">.diedlonely</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num">OSS</div>
-        <div class="stat-label">By Heart</div>
-      </div>
+
+      <div class="footer-text">vxn1r</div>
     </div>
   </div>
-</section>
 
-<!-- SKILLS -->
-<section id="skills">
-  <div class="section-header fade-up">
-    <div class="section-label">02 — Skills</div>
-    <h2 class="section-title">What I do</h2>
-  </div>
-  <div class="skills-grid">
-    <div class="skill-card fade-up">
-      <span class="skill-icon">⚡</span>
-      <div class="skill-name">Cybersecurity</div>
-      <div class="skill-desc">Red team &amp; blue team operations. Penetration testing, vulnerability assessment, and security research.</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Pentest</span>
-        <span class="skill-tag">Red Team</span>
-        <span class="skill-tag">Blue Team</span>
-        <span class="skill-tag">OPSEC</span>
-      </div>
-    </div>
-    <div class="skill-card fade-up">
-      <span class="skill-icon">◎</span>
-      <div class="skill-name">OSINT</div>
-      <div class="skill-desc">Open-source intelligence gathering, breach analysis, digital footprint mapping, and threat investigation.</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Recon</span>
-        <span class="skill-tag">Breach DB</span>
-        <span class="skill-tag">Geolocation</span>
-        <span class="skill-tag">Analysis</span>
-      </div>
-      
+  <audio id="bgMusic" loop preload="auto">
+    <source src="bipolar.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const entry = document.getElementById('entry');
+    const audio = document.getElementById('bgMusic');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const muteBtn = document.getElementById('muteBtn');
+    const speakerIcon = document.getElementById('speakerIcon');
+
+    let isMuted = false;
+    let lastVolume = 0.45;
+
+    audio.volume = 0.45;
+
+    entry.addEventListener('click', () => {
+      entry.classList.add('hidden');
+      audio.play().catch(() => {});
+    });
+
+    volumeSlider.addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      audio.volume = vol;
+      lastVolume = vol;
+      isMuted = vol === 0;
+      updateSpeakerIcon();
+    });
+
+    muteBtn.addEventListener('click', () => {
+      if (isMuted) {
+        audio.volume = lastVolume || 0.45;
+        volumeSlider.value = audio.volume;
+        isMuted = false;
+      } else {
+        lastVolume = audio.volume;
+        audio.volume = 0;
+        volumeSlider.value = 0;
+        isMuted = true;
+      }
+      updateSpeakerIcon();
+    });
+
+    function updateSpeakerIcon() {
+      if (isMuted || audio.volume === 0) {
+        speakerIcon.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        `;
+      } else {
+        speakerIcon.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
