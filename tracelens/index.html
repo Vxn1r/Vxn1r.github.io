@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="TraceLens — passive domain intelligence and evidence management.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflare-dns.com https://dns.google; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta property="og:title" content="TraceLens — Domain Intelligence">
+  <meta property="og:description" content="A quiet, evidence-first workspace for public DNS observations.">
+  <meta property="og:type" content="website">
+  <title>TraceLens — Domain Intelligence</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="./" aria-label="TraceLens home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span class="brand-name">TRACE<span>LENS</span><small>DOMAIN INTELLIGENCE</small></span>
+      </a>
+
+      <div class="side-label">WORKSPACE</div>
+      <nav class="nav-list">
+        <button class="nav-item active" type="button" data-view="overviewView"><span class="nav-icon">◫</span> Overview <kbd>01</kbd></button>
+        <button class="nav-item" type="button" data-view="graphView"><span class="nav-icon">⌘</span> Relationship map <kbd>02</kbd></button>
+        <button class="nav-item" type="button" data-view="evidenceView"><span class="nav-icon">▤</span> Evidence vault <kbd>03</kbd></button>
+        <button class="nav-item" type="button" data-view="historyView"><span class="nav-icon">◷</span> Activity history <kbd>04</kbd></button>
+        <button class="nav-item" type="button" data-view="sourcesView"><span class="nav-icon">ⓘ</span> Method & limits <kbd>05</kbd></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="privacy-card">
+          <span class="privacy-dot"></span>
+          <div><strong>LOCAL EVIDENCE VAULT</strong><p>Your saved data stays in this browser.</p></div>
+        </div>
+        <a class="side-link" href="https://github.com/Vxn1r/TraceLens" target="_blank" rel="noopener noreferrer">SOURCE CODE <span>↗</span></a>
+        <span class="side-version">TRACELENS WEB · 1.0.0</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumb"><span>TRACE /</span> <strong>PASSIVE INTELLIGENCE</strong></div>
+        <div class="topbar-right">
+          <span class="mode-pill"><i></i> PASSIVE ONLY</span>
+          <button class="quiet-button" id="exportReport" type="button">Export report <span>↓</span></button>
+          <button class="quiet-button" id="exportJson" type="button">Export vault <span>↓</span></button>
+        </div>
+      </header>
+
+      <section class="command-center">
+        <div class="eyebrow"><span class="eyebrow-line"></span> PUBLIC DOMAIN RESEARCH / EVIDENCE FIRST</div>
+        <div class="hero-row">
+          <div>
+            <h1>See the surface.<br><em>Keep the evidence.</em></h1>
+            <p class="hero-copy">A focused workspace for public DNS observations, source-backed notes, and changes over time. No noisy scans. No guesswork presented as fact.</p>
+          </div>
+          <div class="scope-stamp"><span>TL</span><div>BOUNDED<br>COLLECTION<br><b>v1.0</b></div></div>
+        </div>
+
+        <form class="lookup-form" id="lookupForm">
+          <label for="domainInput">TARGET DOMAIN</label>
+          <div class="lookup-control">
+            <span class="input-prefix">⌕</span>
+            <input id="domainInput" name="domain" type="text" placeholder="example.com" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="253" required>
+            <button class="scan-button" id="scanButton" type="submit"><span class="scan-glyph">↗</span> Inspect domain</button>
+          </div>
+          <div class="lookup-foot"><span id="lookupStatus" role="status" aria-live="polite">Ready. Enter a domain you own or are authorized to assess.</span><span>DNS ONLY · NO PORTS · NO LOGIN ATTEMPTS</span></div>
+        </form>
+      </section>
+
+      <div class="view-wrap">
+        <section class="view active" id="overviewView" aria-labelledby="overviewTitle">
+          <div class="section-heading">
+            <div><div class="section-index">01 / OVERVIEW</div><h2 id="overviewTitle">Surface summary</h2></div>
+            <span class="target-chip" id="currentTarget">NO TARGET LOADED</span>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card"><div class="metric-label">DNS OBSERVATIONS <span>01</span></div><div class="metric-value" id="metricRecords">—</div><div class="metric-foot">Records in current snapshot</div></article>
+            <article class="metric-card"><div class="metric-label">RECORD TYPES <span>02</span></div><div class="metric-value" id="metricTypes">—</div><div class="metric-foot">Distinct types returned</div></article>
+            <article class="metric-card"><div class="metric-label">SAVED SNAPSHOTS <span>03</span></div><div class="metric-value" id="metricRuns">0</div><div class="metric-foot">Stored in this browser</div></article>
+            <article class="metric-card"><div class="metric-label">SOURCE NOTES <span>04</span></div><div class="metric-value" id="metricNotes">0</div><div class="metric-foot">Manually recorded evidence</div></article>
+          </div>
+
+          <div class="content-grid">
+            <article class="panel record-panel">
+              <div class="panel-heading"><div><span class="panel-kicker">LATEST SNAPSHOT</span><h3>DNS observations</h3></div><span class="tiny-status" id="snapshotTime">AWAITING LOOKUP</span></div>
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>TYPE</th><th>VALUE</th><th>TTL</th><th>ANSWER NAME</th></tr></thead>
+                  <tbody id="recordRows"><tr><td colspan="4" class="empty-cell">No observations yet. Inspect a domain to populate this view.</td></tr></tbody>
+                </table>
+              </div>
+              <div class="table-foot"><span id="recordCount">0 RECORDS</span><span>POINT-IN-TIME RESPONSES</span></div>
+            </article>
+
+            <article class="panel delta-panel">
+              <div class="panel-heading"><div><span class="panel-kicker">SNAPSHOT COMPARISON</span><h3>What changed?</h3></div><span class="delta-mark">Δ</span></div>
+              <p class="panel-description">Compares the latest lookup with the previous saved lookup for this domain.</p>
+              <div class="delta-numbers">
+                <div><strong class="added" id="addedCount">—</strong><span>ADDED</span></div>
+                <div><strong class="removed" id="removedCount">—</strong><span>REMOVED</span></div>
+              </div>
+              <p class="delta-note" id="deltaNote">Run a second lookup to see changes over time.</p>
+              <button class="text-action" type="button" data-view="historyView">View activity history <span>→</span></button>
+            </article>
+          </div>
+
+          <div class="disclaimer-line"><span>i</span> DNS data can vary by resolver and time. Missing answers are not proof that a record does not exist.</div>
+        </section>
+
+        <section class="view" id="graphView" aria-labelledby="graphTitle" hidden>
+          <div class="section-heading">
+            <div><div class="section-index">02 / RELATIONSHIP MAP</div><h2 id="graphTitle">Domain connections</h2></div>
+            <span class="target-chip" id="graphTarget">NO TARGET LOADED</span>
+          </div>
+          <article class="panel graph-panel">
+            <div class="panel-heading"><div><span class="panel-kicker">OBSERVED DNS RELATIONSHIPS</span><h3>One domain. Its returned records.</h3></div><span class="graph-legend"><i class="legend-domain"></i> TARGET <i class="legend-record"></i> DNS ANSWER</span></div>
+            <div class="graph-scroll">
+              <svg id="relationshipGraph" viewBox="0 0 900 390" role="img" aria-label="Relationship map generated from DNS answers"></svg>
+            </div>
+            <div class="graph-caption" id="graphCaption">The map will display only records returned by the selected passive DNS lookup.</div>
+          </article>
+          <div class="disclaimer-line"><span>i</span> Lines represent observed DNS answers only. They do not imply ownership, hosting control, or a confirmed business relationship.</div>
+        </section>
+
+        <section class="view" id="evidenceView" aria-labelledby="evidenceTitle" hidden>
+          <div class="section-heading">
+            <div><div class="section-index">03 / EVIDENCE VAULT</div><h2 id="evidenceTitle">Notes & provenance</h2></div>
+            <span class="target-chip" id="evidenceTarget">NO TARGET LOADED</span>
+          </div>
+          <div class="content-grid evidence-grid">
+            <article class="panel note-panel">
+              <div class="panel-heading"><div><span class="panel-kicker">MANUAL EVIDENCE</span><h3>Add a sourced note</h3></div><span class="note-mark">+</span></div>
+              <form id="noteForm" class="note-form">
+                <label for="noteDomain">DOMAIN</label>
+                <input id="noteDomain" type="text" placeholder="example.com" maxlength="253" required>
+                <label for="noteCategory">CATEGORY</label>
+                <select id="noteCategory"><option>Public documentation</option><option>Organization statement</option><option>Technical observation</option><option>Other public source</option></select>
+                <label for="noteText">OBSERVATION</label>
+                <textarea id="noteText" rows="4" maxlength="1200" placeholder="Record what the source actually says. Separate observation from interpretation." required></textarea>
+                <label for="noteSource">SOURCE URL</label>
+                <input id="noteSource" type="url" placeholder="https://source.example/page" maxlength="2000" required>
+                <label for="noteConfidence">CONFIDENCE</label>
+                <select id="noteConfidence"><option value="unverified">Unverified — not independently checked</option><option value="low">Low — limited supporting context</option><option value="medium">Medium — source is relevant and attributable</option><option value="high">High — corroborated by independent sources</option></select>
+                <button class="primary-button full-button" type="submit">Save evidence note <span>↗</span></button>
+                <p class="form-hint">Notes are user-entered. TraceLens does not fetch or verify the source URL.</p>
+              </form>
+            </article>
+            <article class="panel saved-notes-panel">
+              <div class="panel-heading"><div><span class="panel-kicker">LOCAL RECORDS</span><h3>Saved notes</h3></div><span class="tiny-status" id="noteTotal">0 NOTES</span></div>
+              <div class="note-list" id="noteList"><div class="empty-state">No notes saved for this domain yet.</div></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="historyView" aria-labelledby="historyTitle" hidden>
+          <div class="section-heading">
+            <div><div class="section-index">04 / ACTIVITY HISTORY</div><h2 id="historyTitle">Saved snapshots</h2></div>
+            <span class="target-chip">BROWSER STORAGE</span>
+          </div>
+          <article class="panel history-panel">
+            <div class="panel-heading"><div><span class="panel-kicker">LOCAL HISTORY</span><h3>Lookup timeline</h3></div><span class="tiny-status" id="historyTotal">0 SNAPSHOTS</span></div>
+            <div id="historyList" class="history-list"><div class="empty-state">Your saved DNS snapshots will appear here.</div></div>
+          </article>
+          <div class="history-actions"><button class="quiet-button danger-button" id="clearVault" type="button">Clear local vault <span>×</span></button><span>This removes saved snapshots and notes from this browser only.</span></div>
+        </section>
+
+        <section class="view" id="sourcesView" aria-labelledby="sourcesTitle" hidden>
+          <div class="section-heading">
+            <div><div class="section-index">05 / METHOD & LIMITS</div><h2 id="sourcesTitle">How TraceLens works</h2></div>
+            <span class="target-chip">TRANSPARENT BY DESIGN</span>
+          </div>
+          <div class="content-grid source-grid">
+            <article class="panel source-card"><span class="source-number">01</span><h3>Passive DNS only</h3><p>TraceLens queries a fixed set of public DNS record types: A, AAAA, CNAME, MX, NS, TXT, CAA, and SOA. It does not enumerate subdomains, scan ports, probe services, or attempt authentication.</p></article>
+            <article class="panel source-card"><span class="source-number">02</span><h3>Resolver transparency</h3><p>Lookups use Cloudflare DNS-over-HTTPS, with Google Public DNS as a fallback. The chosen resolver receives the domain query. Do not submit private or sensitive names.</p></article>
+            <article class="panel source-card"><span class="source-number">03</span><h3>Evidence stays local</h3><p>Snapshots and notes are stored in this browser's local storage. There is no TraceLens account, remote database, analytics beacon, or server-side collection. Export your vault to keep a backup.</p></article>
+            <article class="panel source-card"><span class="source-number">04</span><h3>Observed is not proven</h3><p>DNS records are time-stamped observations. They do not prove ownership, affiliation, vulnerability, physical location, or control of an address. A missing record does not prove non-existence.</p></article>
+          </div>
+          <div class="responsible-note"><strong>Responsible use</strong><p>Use only with domains you own or are authorized to assess. TraceLens is designed for learning, public-data verification, and organizing domain-level evidence—not identifying or tracking private individuals.</p><a href="https://github.com/Vxn1r/TraceLens/blob/main/docs/responsible-use.md" target="_blank" rel="noopener noreferrer">Read the responsible-use guide ↗</a></div>
+        </section>
+      </div>
+
+      <footer class="app-footer"><span>TRACELENS <b>·</b> EVIDENCE BEFORE ASSUMPTION</span><span>NO TRACKING · NO SERVER-SIDE VAULT · OPEN SOURCE</span></footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
