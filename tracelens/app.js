@@ -721,5 +721,22 @@
     setView("overviewView");
   }
 
+  document.addEventListener("DOMContentLoaded", () => {
+    const connect = document.getElementById("vxnConnect");
+    const toggle = document.getElementById("vxnConnectToggle");
+    if (connect && toggle) {
+      toggle.addEventListener("click", () => {
+        const opened = connect.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(opened));
+      });
+      document.addEventListener("click", (event) => {
+        if (!connect.contains(event.target)) {
+          connect.classList.remove("open");
+          toggle.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
+  });
+
   document.addEventListener("DOMContentLoaded", initialize);
 })();
