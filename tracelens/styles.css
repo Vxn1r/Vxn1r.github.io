@@ -297,3 +297,50 @@ h1 em { color: var(--accent); font-style: normal; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+
+/* === VXN1R PORTFOLIO THEME === */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --sidebar: #080808;
+  --panel: #0a0a0a;
+  --panel-2: #111111;
+  --line: #1a1a1a;
+  --line-soft: #141414;
+  --text: #e0e0e0;
+  --muted: #888888;
+  --faint: #555555;
+  --accent: #ffffff;
+  --accent-soft: rgba(255,255,255,.065);
+  --cyan: #c4c4c4;
+  --green: #d0d0d0;
+  --amber: #bdbdbd;
+  --red: #d88b91;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #000000;
+  color: var(--text);
+}
+html, body { background: #000000; }
+body {
+  background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #0d0520 40%, #000000 80%);
+}
+.sidebar { background: rgba(5,5,5,.94); border-right-color: #1a1a1a; }
+.topbar { border-bottom-color: #1a1a1a; }
+.brand-mark span { border-color: #ffffff; background: rgba(255,255,255,.035); }
+.brand-mark span:nth-child(2), .brand-mark span:nth-child(3) { background: rgba(255,255,255,.09); }
+.nav-item.active { border-color: rgba(255,255,255,.16); }
+.privacy-card { background: #0a0a0a; border-color: #1a1a1a; }
+.lookup-control { background: rgba(0,0,0,.62); border-color: #2a2a2a; }
+.lookup-control input::placeholder { color: #555555; }
+.scan-button, .primary-button {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #000000;
+}
+.metric-card, .panel, .project-card { background: rgba(8,8,8,.88); border-color: #1a1a1a; }
+.quiet-button, .text-action, .target-chip { border-color: #242424; }
+.quiet-button:hover, .text-action:hover { border-color: #555555; }
+.graph-node rect { stroke: #777777; }
+.graph-edge { stroke: rgba(220,220,220,.35); }
+.toast { background: #0b0b0b; border-color: #333333; }
