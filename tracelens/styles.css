@@ -344,3 +344,27 @@ body {
 .graph-node rect { stroke: #777777; }
 .graph-edge { stroke: rgba(220,220,220,.35); }
 .toast { background: #0b0b0b; border-color: #333333; }
+
+
+/* Vxn1r profile + Instagram connection */
+.vxn-profile-chip{display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border:1px solid #292929;border-radius:999px;background:rgba(5,5,5,.78);color:#fff;text-decoration:none;font:11px var(--mono);letter-spacing:1px}
+.vxn-avatar-ring{position:relative;display:block;width:38px;height:38px;padding:2px;border-radius:50%;background:conic-gradient(from 0deg,#fff 0 22%,#555 35%,#1a0a2e 58%,#fff 78% 100%);animation:vxnSpin 7s linear infinite}
+.vxn-avatar-ring img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;border:2px solid #050505}
+.vxn-profile-chip strong{font-weight:600}
+.vxn-connect{position:fixed;right:22px;bottom:22px;z-index:60}
+.vxn-connect-toggle{display:flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid #343434;border-radius:999px;background:rgba(5,5,5,.92);color:#fff;font:10px var(--mono);letter-spacing:1.2px;cursor:pointer;box-shadow:0 8px 30px #0008}
+.vxn-connect-toggle:hover{border-color:#888}
+.vxn-connect-dot{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff;animation:vxnPulse 2s ease-in-out infinite}
+.vxn-connect-card{position:absolute;right:0;bottom:54px;width:min(290px,calc(100vw - 32px));padding:17px;border:1px solid #333;border-radius:12px;background:rgba(7,7,9,.97);box-shadow:0 18px 55px #000b;opacity:0;visibility:hidden;transform:translateY(9px) scale(.98);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.vxn-connect.open .vxn-connect-card{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.vxn-connect-head{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.vxn-connect-head .vxn-avatar-ring{width:44px;height:44px}
+.vxn-connect-title{color:#fff;font:600 12px var(--mono);letter-spacing:1px}
+.vxn-connect-sub{margin-top:4px;color:#777;font:9px var(--mono)}
+.vxn-instagram-link{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:1px solid #303030;border-radius:7px;color:#fff;text-decoration:none;font:11px var(--mono);transition:background .18s,border-color .18s}
+.vxn-instagram-link:hover{background:#171717;border-color:#777}
+.vxn-connect-hint{margin:11px 1px 0;color:#666;font:9px/1.5 var(--mono)}
+@keyframes vxnSpin{to{transform:rotate(360deg)}}
+@keyframes vxnPulse{50%{opacity:.45;box-shadow:0 0 3px #fff}}
+@media(max-width:560px){.vxn-connect{right:12px;bottom:70px}.vxn-profile-chip{gap:7px;padding-right:9px}.vxn-avatar-ring{width:32px;height:32px}}
+@media(prefers-reduced-motion:reduce){.vxn-avatar-ring,.vxn-connect-dot{animation:none}.vxn-connect-card{transition:none}}
